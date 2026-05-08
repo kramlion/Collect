@@ -11,8 +11,8 @@
             --secondary-color: #A29BFE;
             --accent-color: #FD79A8;
             --light-color: #F8F9FA;
-            --dark-color: #1a1a2e; /* Изменено на более темный фон */
-            --text-color: #e0e0e0; /* Изменено для лучшей читаемости на темном фоне */
+            --dark-color: #1a1a2e;
+            --text-color: #e0e0e0;
             --text-light: #a0a0a0;
             --white: #fff;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -120,6 +120,11 @@
             box-shadow: var(--shadow);
             padding: 25px;
             margin-bottom: 20px;
+            cursor: grab;
+        }
+
+        .collection:active {
+            cursor: grabbing;
         }
 
         .collection-header {
@@ -443,7 +448,7 @@
             background-color: #ff0000;
         }
 
-        /* Collections List */
+        /* Collections List with Drag and Drop */
         .collections-list {
             display: flex;
             flex-direction: column;
@@ -457,6 +462,15 @@
             padding: 15px;
             background-color: #3a3a5a;
             border-radius: 8px;
+            cursor: grab;
+        }
+
+        .collection-item:active {
+            cursor: grabbing;
+        }
+
+        .collection-item.dragging {
+            opacity: 0.5;
         }
 
         .collection-item-info {
@@ -498,6 +512,14 @@
 
         .delete-collection-item-btn:hover {
             background-color: #ff0000;
+        }
+
+        /* Sort Instructions */
+        .sort-instructions {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-light);
+            font-size: 14px;
         }
 
         /* Notifications */
@@ -561,12 +583,12 @@
     <header>
         <div class="logo">
             <i class="fas fa-images"></i>
-            <span>Чек-лист коллекций</span>
+            <span>SCANDIC</span>
         </div>
         <div class="header-actions">
             <button class="admin-btn" id="open-admin-panel">
                 <i class="fas fa-cog"></i>
-                Админ-панель
+                Новая коллекция
             </button>
         </div>
     </header>
@@ -597,7 +619,10 @@
 
             <!-- Список коллекций -->
             <div class="admin-tab-content active" id="collections-tab">
-                <h3>Список коллекций</h3>
+                <div class="sort-instructions">
+                    <i class="fas fa-info-circle"></i>
+                    <span> Перетаскивайте коллекции мышью, чтобы изменить их порядок</span>
+                </div>
                 <div class="collections-list" id="admin-collections-list">
                     <!-- Коллекции будут загружаться здесь -->
                 </div>
@@ -642,6 +667,7 @@
         // Данные приложения
         let collections = JSON.parse(localStorage.getItem('collections')) || [];
         let currentCollectionId = null;
+        let draggedItem = null;
 
         // DOM элементы
         const collectionsContainer = document.getElementById('collections');
@@ -768,10 +794,12 @@
                 return;
             }
 
-            collections.forEach(collection => {
+            collections.forEach((collection, index) => {
                 const collectionItem = document.createElement('div');
                 collectionItem.className = 'collection-item';
                 collectionItem.dataset.id = collection.id;
+                collectionItem.dataset.index = index;
+                collectionItem.draggable = true;
 
                 collectionItem.innerHTML = `
                     <div class="collection-item-info">
@@ -789,6 +817,13 @@
                 `;
 
                 collectionsList.appendChild(collectionItem);
+
+                // Добавляем обработчики событий для перетаскивания
+                collectionItem.addEventListener('dragstart', handleDragStart);
+                collectionItem.addEventListener('dragover', handleDragOver);
+                collectionItem.addEventListener('dragleave', handleDragLeave);
+                collectionItem.addEventListener('drop', handleDrop);
+                collectionItem.addEventListener('dragend', handleDragEnd);
             });
 
             // Добавляем обработчики событий для кнопок редактирования и удаления
@@ -806,6 +841,51 @@
                         deleteCollection(collectionId);
                     }
                 });
+            });
+        }
+
+        // Обработчики событий для перетаскивания
+        function handleDragStart(e) {
+            draggedItem = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+            this.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave() {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (draggedItem !== this) {
+                const fromIndex = parseInt(draggedItem.dataset.index);
+                const toIndex = parseInt(this.dataset.index);
+
+                // Меняем местами коллекции в массиве
+                const itemOne = collections[fromIndex];
+                collections[fromIndex] = collections[toIndex];
+                collections[toIndex] = itemOne;
+
+                saveCollections();
+                renderAdminCollectionsList();
+            }
+
+            this.classList.remove('drag-over');
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.collection-item').forEach(item => {
+                item.classList.remove('drag-over');
             });
         }
 
