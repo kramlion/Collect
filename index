@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чек-лист коллекций</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6C5CE7;
+            --secondary-color: #A29BFE;
+            --accent-color: #FD79A8;
+            --light-color: #F8F9FA;
+            --dark-color: #2D3436;
+            --text-color: #333;
+            --text-light: #666;
+            --white: #fff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--dark-color);
+            color: var(--white);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--accent-color);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .admin-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Main Content */
+        main {
+            padding: 30px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark-color);
+        }
+
+        .page-title h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .page-title p {
+            font-size: 18px;
+            color: var(--text-light);
+        }
+
+        /* Collections */
+        .collections {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .collection {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .collection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .collection-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .collection-title i {
+            color: var(--primary-color);
+        }
+
+        .collection-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-collection-btn, .delete-collection-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .edit-collection-btn:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .delete-collection-btn:hover {
+            background-color: #ff6b6b;
+            color: var(--white);
+        }
+
+        /* Photo Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .photo-card {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            background-color: #f0f0f0;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-checkbox {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .photo-checkbox:hover {
+            transform: scale(1.1);
+        }
+
+        .photo-checkbox i {
+            color: var(--primary-color);
+            font-size: 14px;
+            display: none;
+        }
+
+        .photo-checkbox.checked i {
+            display: block;
+        }
+
+        .photo-card.checked .photo-checkbox {
+            background-color: var(--primary-color);
+        }
+
+        .photo-card.checked .photo-checkbox i {
+            color: var(--white);
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .admin-panel.show {
+            display: flex;
+        }
+
+        .admin-panel-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+        }
+
+        .admin-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .admin-panel-header h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+        }
+
+        .close-admin-panel {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-admin-panel:hover {
+            color: var(--dark-color);
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            border: none;
+            background-color: var(--light-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: var(--border-radius);
+        }
+
+        .admin-tab.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .admin-tab-content {
+            display: none;
+        }
+
+        .admin-tab-content.active {
+            display: block;
+        }
+
+        /* Add/Edit Collection Form */
+        .collection-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-group input, .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #eee;
+        }
+
+        /* Add/Edit Photo Form */
+        .photo-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .photo-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .delete-photo-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #ff6b6b;
+            color: var(--white);
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .delete-photo-btn:hover {
+            background-color: #ff0000;
+        }
+
+        /* Collections List */
+        .collections-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .collection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--light-color);
+            border-radius: 8px;
+        }
+
+        .collection-item-info {
+            flex: 1;
+        }
+
+        .collection-item-title {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .collection-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .collection-item-actions button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .edit-collection-item-btn {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        .edit-collection-item-btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        .delete-collection-item-btn {
+            background-color: #ff6b6b;
+            color: var(--white);
+            border: none;
+        }
+
+        .delete-collection-item-btn:hover {
+            background-color: #ff0000;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--dark-color);
+            color: var(--white);
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 3000;
+            animation: slideInOut 3s ease-in-out;
+        }
+
+        @keyframes slideInOut {
+            0% { transform: translateX(100%); opacity: 0; }
+            10% { transform: translateX(0); opacity: 1; }
+            90% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .photo-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .photo-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .admin-panel-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .photo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-images"></i>
+            <span>Чек-лист коллекций</span>
+        </div>
+        <div class="header-actions">
+            <button class="admin-btn" id="open-admin-panel">
+                <i class="fas fa-cog"></i>
+                Админ-панель
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-title">
+            <h1>Коллекции фотографий</h1>
+            <p>Отметьте нужные фотографии галочкой</p>
+        </div>
+
+        <div class="collections" id="collections">
+            <!-- Коллекции будут загружаться из localStorage -->
+        </div>
+    </main>
+
+    <!-- Админ-панель -->
+    <div class="admin-panel" id="admin-panel">
+        <div class="admin-panel-content">
+            <div class="admin-panel-header">
+                <h2>Админ-панель</h2>
+                <button class="close-admin-panel" id="close-admin-panel">&times;</button>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="collections">Коллекции</button>
+                <button class="admin-tab" data-tab="add-collection">Добавить коллекцию</button>
+            </div>
+
+            <!-- Список коллекций -->
+            <div class="admin-tab-content active" id="collections-tab">
+                <h3>Список коллекций</h3>
+                <div class="collections-list" id="admin-collections-list">
+                    <!-- Коллекции будут загружаться здесь -->
+                </div>
+            </div>
+
+            <!-- Форма добавления/редактирования коллекции -->
+            <div class="admin-tab-content" id="add-collection-tab">
+                <h3 id="collection-form-title">Добавить новую коллекцию</h3>
+                <form class="collection-form" id="collection-form">
+                    <input type="hidden" id="collection-id">
+                    <div class="form-group">
+                        <label for="collection-name">Название коллекции</label>
+                        <input type="text" id="collection-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="collection-description">Описание (опционально)</label>
+                        <textarea id="collection-description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Фотографии</label>
+                        <div class="photo-list" id="photo-list">
+                            <!-- Фотографии будут добавляться здесь -->
+                        </div>
+                        <div class="form-group">
+                            <label for="photo-url">Ссылка на фотографию</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="photo-url" style="flex: 1;" placeholder="https://example.com/image.jpg">
+                                <button type="button" class="btn btn-primary" id="add-photo-btn">Добавить</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="save-collection-btn">Сохранить</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-collection-btn">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные приложения
+        let collections = JSON.parse(localStorage.getItem('collections')) || [];
+        let currentCollectionId = null;
+        let currentPhotoIndex = null;
+
+        // DOM элементы
+        const collectionsContainer = document.getElementById('collections');
+        const adminPanel = document.getElementById('admin-panel');
+        const openAdminPanelBtn = document.getElementById('open-admin-panel');
+        const closeAdminPanelBtn = document.getElementById('close-admin-panel');
+        const adminTabs = document.querySelectorAll('.admin-tab');
+        const adminTabContents = document.querySelectorAll('.admin-tab-content');
+        const collectionsList = document.getElementById('admin-collections-list');
+        const collectionForm = document.getElementById('collection-form');
+        const collectionNameInput = document.getElementById('collection-name');
+        const collectionDescriptionInput = document.getElementById('collection-description');
+        const photoList = document.getElementById('photo-list');
+        const photoUrlInput = document.getElementById('photo-url');
+        const addPhotoBtn = document.getElementById('add-photo-btn');
+        const saveCollectionBtn = document.getElementById('save-collection-btn');
+        const cancelCollectionBtn = document.getElementById('cancel-collection-btn');
+        const collectionFormTitle = document.getElementById('collection-form-title');
+        const collectionIdInput = document.getElementById('collection-id');
+
+        // Отображение коллекций
+        function renderCollections() {
+            collectionsContainer.innerHTML = '';
+
+            if (collections.length === 0) {
+                collectionsContainer.innerHTML = `
+                    <div class="no-collections">
+                        <i class="fas fa-folder-open" style="font-size: 48px; color: var(--text-light); margin-bottom: 15px;"></i>
+                        <p>Коллекций пока нет. Добавьте первую коллекцию в админ-панели!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            collections.forEach(collection => {
+                const collectionElement = document.createElement('div');
+                collectionElement.className = 'collection';
+                collectionElement.dataset.id = collection.id;
+
+                collectionElement.innerHTML = `
+                    <div class="collection-header">
+                        <div class="collection-title">
+                            <i class="fas fa-folder"></i>
+                            <span>${collection.name}</span>
+                        </div>
+                        <div class="collection-actions">
+                            <button class="edit-collection-btn" data-id="${collection.id}" title="Редактировать">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-collection-btn" data-id="${collection.id}" title="Удалить">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="photo-grid" id="photo-grid-${collection.id}"></div>
+                `;
+
+                collectionsContainer.appendChild(collectionElement);
+
+                // Отображаем фотографии коллекции
+                renderPhotos(collection.id, collection.photos);
+            });
+
+            // Добавляем обработчики событий для кнопок редактирования и удаления коллекций
+            document.querySelectorAll('.edit-collection-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const collectionId = e.target.closest('button').dataset.id;
+                    editCollection(collectionId);
+                });
+            });
+
+            document.querySelectorAll('.delete-collection-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const collectionId = e.target.closest('button').dataset.id;
+                    if (confirm('Вы уверены, что хотите удалить эту коллекцию?')) {
+                        deleteCollection(collectionId);
+                    }
+                });
+            });
+        }
+
+        // Отображение фотографий в коллекции
+        function renderPhotos(collectionId, photos) {
+            const photoGrid = document.getElementById(`photo-grid-${collectionId}`);
+            photoGrid.innerHTML = '';
+
+            photos.forEach((photo, index) => {
+                const photoCard = document.createElement('div');
+                photoCard.className = 'photo-card';
+                if (photo.checked) {
+                    photoCard.classList.add('checked');
+                }
+
+                photoCard.innerHTML = `
+                    <img src="${photo.url}" alt="Фото ${index + 1}">
+                    <div class="photo-checkbox" data-collection-id="${collectionId}" data-photo-index="${index}">
+                        <i class="fas fa-check"></i>
+                    </div>
+                `;
+
+                photoGrid.appendChild(photoCard);
+            });
+
+            // Добавляем обработчики событий для галочек
+            photoGrid.querySelectorAll('.photo-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('click', (e) => {
+                    const collectionId = e.target.dataset.collectionId;
+                    const photoIndex = e.target.dataset.photoIndex;
+                    togglePhotoCheck(collectionId, photoIndex);
+                });
+            });
+        }
+
+        // Отображение списка коллекций в админ-панели
+        function renderAdminCollectionsList() {
+            collectionsList.innerHTML = '';
+
+            if (collections.length === 0) {
+                collectionsList.innerHTML = `
+                    <div class="no-collections">
+                        <p>Коллекций пока нет.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            collections.forEach(collection => {
+                const collectionItem = document.createElement('div');
+                collectionItem.className = 'collection-item';
+                collectionItem.dataset.id = collection.id;
+
+                collectionItem.innerHTML = `
+                    <div class="collection-item-info">
+                        <div class="collection-item-title">${collection.name}</div>
+                        <div style="font-size: 14px; color: var(--text-light);">${collection.photos.length} фотографий</div>
+                    </div>
+                    <div class="collection-item-actions">
+                        <button class="edit-collection-item-btn" data-id="${collection.id}" title="Редактировать">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-collection-item-btn" data-id="${collection.id}" title="Удалить">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                collectionsList.appendChild(collectionItem);
+            });
+
+            // Добавляем обработчики событий для кнопок редактирования и удаления
+            document.querySelectorAll('.edit-collection-item-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const collectionId = e.target.closest('button').dataset.id;
+                    editCollection(collectionId);
+                });
+            });
+
+            document.querySelectorAll('.delete-collection-item-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const collectionId = e.target.closest('button').dataset.id;
+                    if (confirm('Вы уверены, что хотите удалить эту коллекцию?')) {
+                        deleteCollection(collectionId);
+                    }
+                });
+            });
+        }
+
+        // Переключение галочки у фотографии
+        function togglePhotoCheck(collectionId, photoIndex) {
+            const collection = collections.find(c => c.id === collectionId);
+            if (!collection) return;
+
+            collection.photos[photoIndex].checked = !collection.photos[photoIndex].checked;
+            saveCollections();
+            renderPhotos(collectionId, collection.photos);
+            showNotification(`Фотография ${photoIndex + 1} ${collection.photos[photoIndex].checked ? 'отмечена' : 'снята с отметки'}`);
+        }
+
+        // Добавление новой коллекции
+        function addNewCollection() {
+            currentCollectionId = null;
+            collectionFormTitle.textContent = 'Добавить новую коллекцию';
+            collectionNameInput.value = '';
+            collectionDescriptionInput.value = '';
+            photoList.innerHTML = '';
+            collectionIdInput.value = '';
+            adminTabs.forEach(tab => tab.classList.remove('active'));
+            adminTabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById('add-collection-tab').classList.add('active');
+            document.querySelector('.admin-tab[data-tab="add-collection"]').classList.add('active');
+        }
+
+        // Редактирование коллекции
+        function editCollection(collectionId) {
+            const collection = collections.find(c => c.id === collectionId);
+            if (!collection) return;
+
+            currentCollectionId = collectionId;
+            collectionFormTitle.textContent = 'Редактировать коллекцию';
+            collectionNameInput.value = collection.name;
+            collectionDescriptionInput.value = collection.description || '';
+            collectionIdInput.value = collection.id;
+
+            // Отображаем фотографии
+            photoList.innerHTML = '';
+            collection.photos.forEach((photo, index) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `
+                    <img src="${photo.url}" alt="Фото ${index + 1}">
+                    <button class="delete-photo-btn" data-index="${index}" title="Удалить">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                photoList.appendChild(photoItem);
+            });
+
+            // Добавляем обработчики событий для кнопок удаления фотографий
+            photoList.querySelectorAll('.delete-photo-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.target.closest('button').dataset.index;
+                    deletePhotoFromCollection(index);
+                });
+            });
+
+            adminTabs.forEach(tab => tab.classList.remove('active'));
+            adminTabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById('add-collection-tab').classList.add('active');
+            document.querySelector('.admin-tab[data-tab="add-collection"]').classList.add('active');
+        }
+
+        // Удаление коллекции
+        function deleteCollection(collectionId) {
+            collections = collections.filter(c => c.id !== collectionId);
+            saveCollections();
+            renderCollections();
+            renderAdminCollectionsList();
+            showNotification('Коллекция удалена');
+        }
+
+        // Добавление фотографии в коллекцию
+        function addPhotoToCollection(url) {
+            if (!currentCollectionId) {
+                // Создаём новую коллекцию, если её нет
+                if (!collections.length) {
+                    addNewCollection();
+                }
+                currentCollectionId = collections[0]?.id;
+            }
+
+            const collection = collections.find(c => c.id === currentCollectionId);
+            if (!collection) return;
+
+            collection.photos.push({
+                url: url,
+                checked: false
+            });
+
+            renderPhotos(currentCollectionId, collection.photos);
+            photoUrlInput.value = '';
+            showNotification('Фотография добавлена');
+        }
+
+        // Удаление фотографии из коллекции
+        function deletePhotoFromCollection(index) {
+            if (!currentCollectionId) return;
+
+            const collection = collections.find(c => c.id === currentCollectionId);
+            if (!collection) return;
+
+            collection.photos.splice(index, 1);
+            renderPhotos(currentCollectionId, collection.photos);
+            showNotification('Фотография удалена');
+        }
+
+        // Сохранение коллекции
+        function saveCollection() {
+            const name = collectionNameInput.value.trim();
+            const description = collectionDescriptionInput.value.trim();
+
+            if (!name) {
+                showNotification('Введите название коллекции');
+                return;
+            }
+
+            const photos = Array.from(photoList.children).map(photoItem => {
+                const img = photoItem.querySelector('img');
+                return {
+                    url: img.src,
+                    checked: false
+                };
+            });
+
+            if (photos.length === 0) {
+                showNotification('Добавьте хотя бы одну фотографию');
+                return;
+            }
+
+            if (currentCollectionId) {
+                // Редактируем существующую коллекцию
+                const collectionIndex = collections.findIndex(c => c.id === currentCollectionId);
+                collections[collectionIndex] = {
+                    ...collections[collectionIndex],
+                    name: name,
+                    description: description,
+                    photos: photos
+                };
+                showNotification('Коллекция обновлена');
+            } else {
+                // Добавляем новую коллекцию
+                const newCollection = {
+                    id: Date.now().toString(),
+                    name: name,
+                    description: description,
+                    photos: photos
+                };
+                collections.push(newCollection);
+                showNotification('Коллекция добавлена');
+            }
+
+            saveCollections();
+            renderCollections();
+            renderAdminCollectionsList();
+            cancelCollection();
+        }
+
+        // Отмена редактирования коллекции
+        function cancelCollection() {
+            currentCollectionId = null;
+            adminTabs.forEach(tab => tab.classList.remove('active'));
+            adminTabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById('collections-tab').classList.add('active');
+            document.querySelector('.admin-tab[data-tab="collections"]').classList.add('active');
+        }
+
+        // Сохранение всех коллекций в localStorage
+        function saveCollections() {
+            localStorage.setItem('collections', JSON.stringify(collections));
+        }
+
+        // Отображение уведомления
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Инициализация
+        function init() {
+            // Загружаем коллекции из localStorage
+            renderCollections();
+            renderAdminCollectionsList();
+
+            // Открытие админ-панели
+            openAdminPanelBtn.addEventListener('click', () => {
+                adminPanel.classList.add('show');
+            });
+
+            // Закрытие админ-панели
+            closeAdminPanelBtn.addEventListener('click', () => {
+                adminPanel.classList.remove('show');
+                cancelCollection();
+            });
+
+            // Переключение вкладок в админ-панели
+            adminTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    adminTabs.forEach(t => t.classList.remove('active'));
+                    adminTabContents.forEach(c => c.classList.remove('active'));
+
+                    tab.classList.add('active');
+                    const tabId = tab.dataset.tab;
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+
+                    if (tabId === 'add-collection') {
+                        addNewCollection();
+                    }
+                });
+            });
+
+            // Добавление фотографии
+            addPhotoBtn.addEventListener('click', () => {
+                const url = photoUrlInput.value.trim();
+                if (!url) {
+                    showNotification('Введите URL фотографии');
+                    return;
+                }
+                addPhotoToCollection(url);
+            });
+
+            // Сохранение коллекции
+            collectionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveCollection();
+            });
+
+            // Отмена редактирования коллекции
+            cancelCollectionBtn.addEventListener('click', cancelCollection);
+
+            // Закрытие админ-панели при клике вне её
+            adminPanel.addEventListener('click', (e) => {
+                if (e.target === adminPanel) {
+                    adminPanel.classList.remove('show');
+                    cancelCollection();
+                }
+            });
+        }
+
+        // Загружаем данные при загрузке страницы
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
