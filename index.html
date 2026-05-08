@@ -639,7 +639,6 @@
         // Данные приложения
         let collections = JSON.parse(localStorage.getItem('collections')) || [];
         let currentCollectionId = null;
-        let currentPhotoIndex = null;
 
         // DOM элементы
         const collectionsContainer = document.getElementById('collections');
@@ -698,8 +697,6 @@
                 `;
 
                 collectionsContainer.appendChild(collectionElement);
-
-                // Отображаем фотографии коллекции
                 renderPhotos(collection.id, collection.photos);
             });
 
@@ -724,6 +721,8 @@
         // Отображение фотографий в коллекции
         function renderPhotos(collectionId, photos) {
             const photoGrid = document.getElementById(`photo-grid-${collectionId}`);
+            if (!photoGrid) return;
+
             photoGrid.innerHTML = '';
 
             photos.forEach((photo, index) => {
@@ -884,10 +883,14 @@
         function addPhotoToCollection(url) {
             if (!currentCollectionId) {
                 // Создаём новую коллекцию, если её нет
-                if (!collections.length) {
-                    addNewCollection();
-                }
-                currentCollectionId = collections[0]?.id;
+                currentCollectionId = Date.now().toString();
+                collections.push({
+                    id: currentCollectionId,
+                    name: 'Новая коллекция',
+                    description: '',
+                    photos: []
+                });
+                collectionNameInput.value = 'Новая коллекция';
             }
 
             const collection = collections.find(c => c.id === currentCollectionId);
@@ -898,7 +901,23 @@
                 checked: false
             });
 
-            renderPhotos(currentCollectionId, collection.photos);
+            // Обновляем отображение фотографий в форме
+            const photoItem = document.createElement('div');
+            photoItem.className = 'photo-item';
+            photoItem.innerHTML = `
+                <img src="${url}" alt="Фото ${collection.photos.length}">
+                <button class="delete-photo-btn" data-index="${collection.photos.length - 1}" title="Удалить">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            photoList.appendChild(photoItem);
+
+            // Добавляем обработчик для новой кнопки удаления
+            photoItem.querySelector('.delete-photo-btn').addEventListener('click', (e) => {
+                const index = e.target.closest('button').dataset.index;
+                deletePhotoFromCollection(index);
+            });
+
             photoUrlInput.value = '';
             showNotification('Фотография добавлена');
         }
@@ -911,7 +930,27 @@
             if (!collection) return;
 
             collection.photos.splice(index, 1);
-            renderPhotos(currentCollectionId, collection.photos);
+
+            // Обновляем список фотографий в форме
+            photoList.innerHTML = '';
+            collection.photos.forEach((photo, i) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `
+                    <img src="${photo.url}" alt="Фото ${i + 1}">
+                    <button class="delete-photo-btn" data-index="${i}" title="Удалить">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                photoList.appendChild(photoItem);
+
+                // Добавляем обработчик для новой кнопки удаления
+                photoItem.querySelector('.delete-photo-btn').addEventListener('click', (e) => {
+                    const idx = e.target.closest('button').dataset.index;
+                    deletePhotoFromCollection(idx);
+                });
+            });
+
             showNotification('Фотография удалена');
         }
 
@@ -942,7 +981,7 @@
                 // Редактируем существующую коллекцию
                 const collectionIndex = collections.findIndex(c => c.id === currentCollectionId);
                 collections[collectionIndex] = {
-                    ...collections[collectionIndex],
+                    id: currentCollectionId,
                     name: name,
                     description: description,
                     photos: photos
@@ -1035,7 +1074,10 @@
                 addPhotoToCollection(url);
             });
 
-            // Сохранение коллекции
+            // Сохранение коллекции (обработчик для кнопки)
+            saveCollectionBtn.addEventListener('click', saveCollection);
+
+            // Сохранение коллекции (обработчик для формы)
             collectionForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 saveCollection();
